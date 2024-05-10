@@ -1,12 +1,26 @@
 package com.example.nat_glam.validator;
-
+import com.example.nat_glam.order.repository.OrderRepository;
+import com.example.nat_glam.user.model.User;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.example.nat_glam.user.repository.UserRepository;
 import java.util.InputMismatchException;
+
 @Service
+@Transactional
 public class ValidatorService {
 
-    public static boolean isValidCPF(String cpf){
+    private final UserRepository userRepository;
+    private final OrderRepository orderRepository;
+
+    @Autowired()
+    ValidatorService(UserRepository userRepository, OrderRepository orderRepository) {
+        this.userRepository = userRepository;
+        this.orderRepository = orderRepository;
+    }
+
+    private boolean isValidCPF(String cpf){
         cpf = cpf.replaceAll("[^0-9]", "");
         if (cpf.length() != 11) return false;
         if (cpf.matches("(\\d)\\1{10}")) return false;
@@ -32,6 +46,30 @@ public class ValidatorService {
         } catch (InputMismatchException e){
             return false;
         }
+
+    }
+
+    private boolean findOrdersWithNoPayments(String cpf) {
+        Long query = this.orderRepository.countUnpaidOrdersByCpf(cpf);
+        return query > 0;
+    }
+
+    private boolean  verifyClientIsTrust(String cpf) {
+        Boolean user = this.userRepository.findTrustedByCpf(cpf);
+        if (user == null) return false;
+        return user;
+    }
+
+    protected boolean isUserTrusted(String cpf) {
+        String userExist = userRepository.findUserByCpf(cpf);
+        if (userExist == null) return false;
+
+        if(isValidCPF(cpf) && !findOrdersWithNoPayments(cpf) && verifyClientIsTrust(cpf)){
+            return true;
+        }
+
+        userRepository.updateByCpf(cpf,false);
+        return false;
 
     }
 }

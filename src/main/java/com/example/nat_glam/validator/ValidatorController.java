@@ -6,12 +6,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController("validator")
 public class ValidatorController {
-    public ValidatorController() {
+    private  final ValidatorService validatorService;
+    public ValidatorController(ValidatorService validatorService) {
+        this.validatorService = validatorService;
     }
 
     @GetMapping("/validateuser/{cpf}")
-    public Boolean Validate(@PathVariable("cpf")Long cpf){
-
+    public Boolean Validate(@PathVariable("cpf") String cpf){
+        return this.validatorService.isUserTrusted(cpf);
     }
 
 }

@@ -1,7 +1,6 @@
-package user;
+package com.example.nat_glam.user.model;
 
 import java.time.LocalDate;
-import java.util.InputMismatchException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,7 +11,7 @@ public class User {
 
     public User(){}
 
-    private User(String fullName, Long cpf, String email, String cellphone, String address, String password, LocalDate birthdate, Boolean trusted){
+    private User(String fullName, String cpf, String email, String cellphone, String address, String password, LocalDate birthdate, Boolean trusted){
         this.fullName = fullName;
         this.cpf = cpf;
         this.email = email;
@@ -43,7 +42,7 @@ public class User {
 
     @Id
     @Column(name = "cpf_cli")
-    private Long cpf;
+    private String cpf;
 
     @Column(name = "email_cli")
     private String email;
@@ -101,11 +100,11 @@ public class User {
         this.trusted = trusted;
     }
 
-    public Long getCpf() {
+    public String getCpf() {
         return cpf;
     }
 
-    public void setCpf(Long cpf) {
+    public void setCpf(String cpf) {
         this.cpf = cpf;
     }
 
